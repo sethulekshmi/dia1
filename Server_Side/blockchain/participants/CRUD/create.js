@@ -42,6 +42,7 @@ let registerUser = function(req, res) {
 			numberAff = "0008";
 			break;
     }
+    console.log("hello")
 
     //TEMPORARY, REMOVE WHEN USING NODE SDK
     let secret = '';
