@@ -16,7 +16,7 @@ var logger = shim.NewLogger("CLDChaincode")
 //CURRENT WORKAROUND USES ROLES CHANGE WHEN OWN USERS CAN BE CREATED SO THAT IT READ 1, 2, 3, 4, 5
 const   MINER           =  "miner"
 const   DISTRIBUTOR      =  "distributor"
-const   DEALER          =  "dealership"
+const   DEALER          =  "dealer"
 const   BUYER           =  "buyer"
 const   TRADER          =  "trader"
 const   CUTTER          =  "cutter"
@@ -256,8 +256,8 @@ func (t *SimpleChaincode) Invoke(stub  shim.ChaincodeStubInterface, function str
 			
 					
 				if 		   function == "miner_to_distributor" { return t.miner_to_distributor(stub, d, caller, caller_affiliation, args[0], "distributor")
-				} else if  function == "distributor_to_dealership"   { return t.distributor_to_dealership(stub, d, caller, caller_affiliation, args[0], "dealer")
-				} else if  function == "dealership_to_buyer" 	   { return t.dealership_to_buyer(stub, d, caller, caller_affiliation, args[0], "buyer")
+				} else if  function == "distributor_to_dealer"   { return t.distributor_to_dealer(stub, d, caller, caller_affiliation, args[0], "dealer")
+				} else if  function == "dealer_to_buyer" 	   { return t.dealer_to_buyer(stub, d, caller, caller_affiliation, args[0], "buyer")
 				} else if  function == "buyer_to_trader"  { return t.buyer_to_trader(stub, d, caller, caller_affiliation, args[0], "trader")
 				} else if  function == "trader_to_cutter"  { return t.trader_to_cutter(stub, d, caller, caller_affiliation, args[0], "cutter")
 				} else if  function == "cutter_to_jewellery_maker" { return t.cutter_to_jewellery_maker(stub, d, caller, caller_affiliation, args[0], "jewellery_maker")
@@ -305,10 +305,10 @@ func (t *SimpleChaincode) Query(stub  shim.ChaincodeStubInterface, function stri
 			if len(args) != 1 { fmt.Printf("Incorrect number of arguments passed"); return nil, errors.New("QUERY: Incorrect number of arguments passed") }
 	
 	
-			d, err := t.retrieve_assets(stub, args[0])
+			v, err := t.retrieve_assets(stub, args[0])
 																							if err != nil { fmt.Printf("QUERY: Error retrieving asset: %s", err); return nil, errors.New("QUERY: Error retrieving v5c "+err.Error()) }
 	
-			return t.get_diamond_details(stub, d, caller, caller_affiliation)
+			return t.get_diamond_details(stub, v, caller, caller_affiliation)
 			
 	} else if function == "get_diamonds" {
 			return t.get_diamonds(stub, caller, caller_affiliation)
@@ -447,12 +447,12 @@ if 		        d.Timestamp 	 == "TIMESTAMP" ||
 }
 
 //=================================================================================================================================
-//	 distributor_to_dealership
+//	 distributor_to_dealer
 //=================================================================================================================================
-func (t *SimpleChaincode) distributor_to_dealership(stub  shim.ChaincodeStubInterface, d Diamond, caller string, caller_affiliation string, recipient_name string, recipient_affiliation string) ([]byte, error) {
+func (t *SimpleChaincode) distributor_to_dealer(stub  shim.ChaincodeStubInterface, d Diamond, caller string, caller_affiliation string, recipient_name string, recipient_affiliation string) ([]byte, error) {
 	
 	 
-   fmt.Printf("distributor_TO_DEALERSHIP %s %s %s %s ",d.Status,d.Owner,caller_affiliation,recipient_affiliation);
+   fmt.Printf("distributor_TO_DEALER2 %s %s %s %s ",d.Status,d.Owner,caller_affiliation,recipient_affiliation);
 	
 	if 		d.Status				== STATE_DISTRIBUTING	&& 
 			d.Owner					== caller				&& 
@@ -468,16 +468,16 @@ func (t *SimpleChaincode) distributor_to_dealership(stub  shim.ChaincodeStubInte
 	
 	_, err := t.save_changes(stub, d)
 	
-															if err != nil { fmt.Printf("distributor_TO_DEALERSHIP: Error saving changes: %s", err); return nil, errors.New("Error saving changes") }
+															if err != nil { fmt.Printf("distributor_TO_DEALER: Error saving changes: %s", err); return nil, errors.New("Error saving changes") }
 	
 	return nil, nil
 	
 }
 
 //=================================================================================================================================
-//	 dealership_to_buyer
+//	 dealer_to_buyer
 //=================================================================================================================================
-func (t *SimpleChaincode) dealership_to_buyer(stub  shim.ChaincodeStubInterface, d Diamond, caller string, caller_affiliation string, recipient_name string, recipient_affiliation string) ([]byte, error) {
+func (t *SimpleChaincode) dealer_to_buyer(stub  shim.ChaincodeStubInterface, d Diamond, caller string, caller_affiliation string, recipient_name string, recipient_affiliation string) ([]byte, error) {
 	
 	if 		d.Status				== STATE_BUYING	&&
 			d.Owner					== caller					&&
@@ -494,7 +494,7 @@ func (t *SimpleChaincode) dealership_to_buyer(stub  shim.ChaincodeStubInterface,
 	
 	_, err := t.save_changes(stub, d)
 	
-															if err != nil { fmt.Printf("DEALERSHIP_TO_BUYER: Error saving changes: %s", err); return nil, errors.New("Error saving changes") }
+															if err != nil { fmt.Printf("DEALER_TO_BUYER: Error saving changes: %s", err); return nil, errors.New("Error saving changes") }
 	
 	return nil, nil
 	
